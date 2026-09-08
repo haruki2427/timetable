@@ -9,7 +9,6 @@
   <meta name="apple-mobile-web-app-title" content="時間割">
   <title>時間割</title>
 
-  <!-- 独立した manifest.json を読み込み -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="icon.png">
   <link rel="apple-touch-icon" href="icon.png">
@@ -33,7 +32,6 @@
       align-items: center;
     }
     
-    /* リダイレクト画面（PWA起動時） */
     #redirect-view {
       display: none;
       text-align: center;
@@ -78,7 +76,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* ホーム画面追加案内画面（通常のブラウザ閲覧時） */
     #guide-view {
       display: none;
       width: 90%;
@@ -127,7 +124,6 @@
       color: #1e88e5;
     }
 
-    /* Ctrl + Shift + 1 ソース表示モーダル */
     #source-modal {
       display: none;
       position: fixed;
@@ -177,7 +173,6 @@
 </head>
 <body>
 
-  <!-- PWA起動用: リダイレクト画面 -->
   <div id="redirect-view">
     <div class="status-wrapper">
       <span class="status-text">リダイレクト中</span>
@@ -186,7 +181,6 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- ブラウザ直接アクセス用: インストール案内画面 -->
   <div id="guide-view">
     <img src="icon.png" alt="時間割アイコン" class="icon-img">
     <div class="guide-title">アプリをインストールしてください</div>
@@ -200,7 +194,6 @@
     </div>
   </div>
 
-  <!-- 全ソースコード表示モーダル (Ctrl + Shift + 1) -->
   <div id="source-modal">
     <header>
       <h2 style="font-size: 16px; color: #fff;">ソースコードビューア (Ctrl+Shift+1)</h2>
@@ -214,12 +207,11 @@
     const redirectView = document.getElementById('redirect-view');
     const guideView = document.getElementById('guide-view');
     const dotsElem = document.getElementById('dots');
-    
+
     const sourceModal = document.getElementById('source-modal');
     const sourceContent = document.getElementById('source-content');
     const closeModalBtn = document.getElementById('close-modal-btn');
 
-    // 厳密なPWA（スタンドアロンモード）判定
     function isPWA() {
       if (window.matchMedia('(display-mode: browser)').matches) {
         return false;
@@ -254,7 +246,6 @@
       }, 400);
     }
 
-    // キーボードショートカット: Ctrl + Shift + 1 でソース表示
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.shiftKey && (e.key === '1' || e.code === 'Digit1')) {
         e.preventDefault();
@@ -275,7 +266,6 @@
       sourceModal.style.display = 'none';
     });
 
-    // 外部 Service Worker ファイルの登録（WebAPK必須条件）
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
