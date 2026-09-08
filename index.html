@@ -223,25 +223,32 @@
     const sourceContent = document.getElementById('source-content');
     const closeModalBtn = document.getElementById('close-modal-btn');
 
-    // PWA（スタンドアロンモード）で動いているか判定
+    // 厳密なPWA（スタンドアロンモード）判定
     function isPWA() {
-      return (
-        window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone === true ||
-        document.referrer.includes('android-app://')
-      );
+      // 明示的にブラウザモード（通常アクセス）である場合は false
+      if (window.matchMedia('(display-mode: browser)').matches) {
+        return false;
+      }
+
+      // スタンドアロンまたは全画面モードで起動しているかチェック
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+      const isMinimalUi = window.matchMedia('(display-mode: minimal-ui)').matches;
+      const isIosStandalone = window.navigator.standalone === true;
+
+      return isStandalone || isFullscreen || isMinimalUi || isIosStandalone;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       if (isPWA()) {
-        // PWA（ホーム画面から起動）の場合：リダイレクトを実行
+        // PWA（ホーム画面アイコン）から起動された場合のみリダイレクトを実行
         redirectView.style.display = 'block';
         startRedirectAnimation();
         setTimeout(() => {
           window.location.replace(targetUrl);
         }, 300);
       } else {
-        // 通常のブラウザでアクセスされた場合：案内画面を表示（リダイレクトなし）
+        // 通常ブラウザアクセス時はリダイレクトをブロックし、案内画面を表示
         guideView.style.display = 'block';
       }
     });
@@ -278,7 +285,7 @@
       sourceModal.style.display = 'none';
     });
 
-    // インライン Service Worker (PWA動作安定化用)
+    // インライン Service Worker
     if ('serviceWorker' in navigator) {
       const swCode = `
         self.addEventListener('install', (e) => self.skipWaiting());
