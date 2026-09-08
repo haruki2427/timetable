@@ -24,13 +24,16 @@
       height: 100%;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #ffffff;
+      background-color: #f8fafc;
+      color: #1e293b;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     
-    .redirect-container {
+    /* リダイレクト画面（PWA起動時） */
+    #redirect-view {
+      display: none;
       text-align: center;
       padding: 24px;
     }
@@ -71,6 +74,61 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    /* ホーム画面追加案内画面（通常のブラウザ閲覧時） */
+    #guide-view {
+      display: none;
+      width: 90%;
+      max-width: 400px;
+      background: #ffffff;
+      padding: 28px 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .icon-box {
+      width: 64px;
+      height: 64px;
+      background-color: #1e88e5;
+      color: #ffffff;
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0 auto 16px auto;
+      box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+    }
+
+    .guide-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .guide-desc {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .steps {
+      background-color: #f1f5f9;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 13px;
+      color: #334155;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    .steps strong {
+      color: #1e88e5;
     }
 
     /* Ctrl + Shift + 1 ソース表示モーダル */
@@ -123,12 +181,27 @@
 </head>
 <body>
 
-  <div class="redirect-container">
+  <!-- PWA起動用: リダイレクト画面 -->
+  <div id="redirect-view">
     <div class="status-wrapper">
       <span class="status-text">リダイレクト中</span>
       <span id="dots" class="dots"></span>
     </div>
     <div class="spinner"></div>
+  </div>
+
+  <!-- ブラウザ直接アクセス用: インストール案内画面 -->
+  <div id="guide-view">
+    <div class="icon-box">時間割</div>
+    <div class="guide-title">ホーム画面に追加してください</div>
+    <div class="guide-desc">
+      このページはアプリ専用です。<br>ホーム画面に追加してから起動してください。
+    </div>
+    <div class="steps">
+      <strong>【追加方法】</strong><br>
+      • <strong>iPhone (Safari):</strong> 共有ボタン ➔「ホーム画面に追加」<br>
+      • <strong>Android (Chrome):</strong> 右上メニュー「⋮」➔「ホーム画面に追加」
+    </div>
   </div>
 
   <!-- 全ソースコード表示モーダル (Ctrl + Shift + 1) -->
@@ -142,26 +215,47 @@
 
   <script>
     const targetUrl = 'https://sites.google.com/view/osdatabase-2427/timetable';
+    const redirectView = document.getElementById('redirect-view');
+    const guideView = document.getElementById('guide-view');
     const dotsElem = document.getElementById('dots');
+    
     const sourceModal = document.getElementById('source-modal');
     const sourceContent = document.getElementById('source-content');
     const closeModalBtn = document.getElementById('close-modal-btn');
 
-    // 「リダイレクト中」の位置を固定し、右側のドットのみ変化させるアニメーション
-    const dotStates = ['', '.', '..', '...'];
-    let currentStateIndex = 0;
+    // PWA（スタンドアロンモード）で動いているか判定
+    function isPWA() {
+      return (
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true ||
+        document.referrer.includes('android-app://')
+      );
+    }
 
-    setInterval(() => {
-      currentStateIndex = (currentStateIndex + 1) % dotStates.length;
-      dotsElem.textContent = dotStates[currentStateIndex];
-    }, 400);
-
-    // osdatabase への自動リダイレクト実行
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        window.location.replace(targetUrl);
-      }, 300);
+      if (isPWA()) {
+        // PWA（ホーム画面から起動）の場合：リダイレクトを実行
+        redirectView.style.display = 'block';
+        startRedirectAnimation();
+        setTimeout(() => {
+          window.location.replace(targetUrl);
+        }, 300);
+      } else {
+        // 通常のブラウザでアクセスされた場合：案内画面を表示（リダイレクトなし）
+        guideView.style.display = 'block';
+      }
     });
+
+    // 「リダイレクト中...」アニメーション
+    function startRedirectAnimation() {
+      const dotStates = ['', '.', '..', '...'];
+      let currentStateIndex = 0;
+
+      setInterval(() => {
+        currentStateIndex = (currentStateIndex + 1) % dotStates.length;
+        dotsElem.textContent = dotStates[currentStateIndex];
+      }, 400);
+    }
 
     // キーボードショートカット: Ctrl + Shift + 1 でソース表示
     window.addEventListener('keydown', (e) => {
