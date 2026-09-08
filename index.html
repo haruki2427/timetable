@@ -11,7 +11,8 @@
 
   <!-- 独立した manifest.json を読み込み -->
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
 
   <style>
     * {
@@ -89,19 +90,13 @@
       text-align: center;
     }
 
-    .icon-box {
-      width: 64px;
-      height: 64px;
-      background-color: #1e88e5;
-      color: #ffffff;
-      border-radius: 14px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      font-weight: bold;
+    .icon-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
       margin: 0 auto 16px auto;
-      box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      object-fit: cover;
     }
 
     .guide-title {
@@ -130,23 +125,6 @@
 
     .steps strong {
       color: #1e88e5;
-    }
-
-    .open-btn {
-      width: 100%;
-      margin-top: 16px;
-      padding: 12px;
-      background-color: #1e88e5;
-      color: #ffffff;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .open-btn:active {
-      background-color: #1565c0;
     }
 
     /* Ctrl + Shift + 1 ソース表示モーダル */
@@ -210,7 +188,7 @@
 
   <!-- ブラウザ直接アクセス用: インストール案内画面 -->
   <div id="guide-view">
-    <div class="icon-box">時間割</div>
+    <img src="icon.png" alt="時間割アイコン" class="icon-img">
     <div class="guide-title">アプリをインストールしてください</div>
     <div class="guide-desc">
       このページはアプリ専用です。<br>ホーム画面に追加するとアプリとして利用できます。
@@ -220,7 +198,6 @@
       • <strong>Android (Chrome):</strong> メニュー「⋮」➔「アプリをインストール」<br>
       • <strong>iPhone (Safari):</strong> 共有 ➔「ホーム画面に追加」
     </div>
-    <button id="direct-btn" class="open-btn">そのまま時間割を開く</button>
   </div>
 
   <!-- 全ソースコード表示モーダル (Ctrl + Shift + 1) -->
@@ -237,7 +214,6 @@
     const redirectView = document.getElementById('redirect-view');
     const guideView = document.getElementById('guide-view');
     const dotsElem = document.getElementById('dots');
-    const directBtn = document.getElementById('direct-btn');
     
     const sourceModal = document.getElementById('source-modal');
     const sourceContent = document.getElementById('source-content');
@@ -266,10 +242,6 @@
       } else {
         guideView.style.display = 'block';
       }
-    });
-
-    directBtn.addEventListener('click', () => {
-      window.location.replace(targetUrl);
     });
 
     function startRedirectAnimation() {
